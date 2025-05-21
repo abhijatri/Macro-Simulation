@@ -199,23 +199,24 @@ impulse_response_plot <- function(a, ci = 0.95, n.ahead = 10, runs = 100){
   
   ggplot(data = ir_long, aes(x = t, y = value)) +
     geom_line(aes(linetype = variable, colour = variable)) + 
+    geom_hline(yintercept = 0) + 
     scale_colour_manual(values = c("red4", "green4", "red4")) + 
     scale_linetype_manual(values = c(2,1,2)) + 
     facet_grid(impulse ~ response , scales = "free") + theme_bw() +
     labs(title = "Impulse Response", 
          subtitle = paste("CI =",ci),
-         x = "Forecast (t)", y = "Response", linetype = "", colour = "") + 
+         x = "Forecast (t)", y = "", linetype = "", colour = "") + 
     theme(legend.position = "bottom")
 }
 
 
-#check what provides the optimum lag of endogeneous variables
-varselect <- VARselect(y = Canada)
+#check what provides the optimum lag of endogenous variables
+varselect <- VARselect(y = au_me_data_4qtr_chg)
 print(varselect)
 
 restrict_mat <- matrix(c(1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0), nrow=4, ncol=9, byrow=TRUE)
 
-l <- var_simulation(df = Canada, p = 1, nsim = 5000, burn_in_period = 30,
+l <- var_simulation(df = au_me_data_log_8qtr_chg, p = 2, nsim = 10000, burn_in_period = 30,
                     type = "restrict", restrict_type = "ser", thresh = 2, restrict_mat = restrict_mat)                                 
 
 impulse_response_plot(a = l$model_object, ci = 0.95, n.ahead = 30, runs = 100)
